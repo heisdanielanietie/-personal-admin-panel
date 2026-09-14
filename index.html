@@ -305,7 +305,7 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6aWFlZmd5cmt1aGlmZ2loaHRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMTQ4NDUsImV4cCI6MjEwNDc5MDg0NX0.EfRo0vOVc0zfwxTps6UArhRs4Gc9PjVMZJeIKB9Mnc8";
   // ----------------------------------------------------------------
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let projects = [];
   let currentProjectId = null;
@@ -328,7 +328,7 @@
     loginError.textContent = "";
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if (error) {
       loginError.textContent = error.message;
       return;
@@ -337,7 +337,7 @@
   }
 
   async function checkSession() {
-    const { data } = await supabase.auth.getSession();
+    const { data } = await supabaseClient.auth.getSession();
     if (data.session) showApp();
   }
   checkSession();
@@ -350,7 +350,7 @@
 
   // ---------- PROJECTS ----------
   async function loadProjects() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("projects")
       .select("*")
       .order("created_at", { ascending: true });
@@ -381,7 +381,7 @@
       name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
     );
     if (!slug) return;
-    const { error } = await supabase.from("projects").insert({ name, slug });
+    const { error } = await supabaseClient.from("projects").insert({ name, slug });
     if (error) { alert("Couldn't create project: " + error.message); return; }
     loadProjects();
   });
@@ -395,7 +395,7 @@
     mainStatus.textContent = "";
     mainBody.innerHTML = `<div class="empty-state">Loading…</div>`;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("content_blocks")
       .select("*")
       .eq("project_id", id)
@@ -442,7 +442,7 @@
 
       saveBtn.addEventListener("click", async () => {
         saveState.textContent = "Saving…";
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from("content_blocks")
           .update({ value: textarea.value, updated_at: new Date().toISOString() })
           .eq("id", block.id);
@@ -466,7 +466,7 @@
     addBtn.addEventListener("click", async () => {
       const key = prompt("Field key (e.g. hero_title) — matches data-cms-key in your HTML:");
       if (!key) return;
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from("content_blocks")
         .insert({ project_id: currentProjectId, key, value: "" });
       if (error) { alert("Couldn't add field: " + error.message); return; }
