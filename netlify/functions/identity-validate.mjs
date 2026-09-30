@@ -1,0 +1,2 @@
+// Block registration for everyone except the configured workspace owner.
+export const handler=async(event)=>{try{const {user}=JSON.parse(event.body||'{}');const expected=process.env.STUDIO_OWNER_EMAIL?.trim().toLowerCase();if(!expected||user?.email?.toLowerCase()!==expected)return {statusCode:403,body:JSON.stringify({error:'Registration is limited to the workspace owner.'})};return {statusCode:200,body:'{}'};}catch{return {statusCode:400,body:'Invalid request'};}};
