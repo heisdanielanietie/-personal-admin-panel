@@ -1,9 +1,10 @@
+import {allowedRequestOrigin} from '@/lib/request-origin';
 import {MAX_HTML_BYTES} from '@/lib/limits';
 import {getStore,getDeployStore} from '@netlify/blobs';
 import {currentOwner} from '@/lib/auth';
 export class HttpError extends Error{constructor(public status:number,message:string){super(message);}}
 export function store(){return process.env.CONTEXT==='production'?getStore({name:'daniel-studio',consistency:'strong'}):getDeployStore({name:'daniel-studio',consistency:'strong'});}
-export async function owner(request?:Request){const u=await currentOwner();if(!u)throw new HttpError(401,'Please sign in with the workspace owner account.');if(request&&request.method!=='GET'){const origin=request.headers.get('origin');if(!origin||origin!==new URL(request.url).origin)throw new HttpError(403,'This request is not allowed.');}return u.userId;}
+export async function owner(request?:Request){const u=await currentOwner();if(!u)throw new HttpError(401,'Please sign in with the workspace owner account.');if(request&&request.method!=='GET'){if(!allowedRequestOrigin(request))throw new HttpError(403,'This request is not allowed.');}return u.userId;}
 export function failure(e:unknown){console.error(e);return Response.json({error:e instanceof HttpError?e.message:'Your changes could not be saved. Please try again.'},{status:e instanceof HttpError?e.status:503,headers:{'Cache-Control':'no-store'}});}
 export function validateHtml(h:unknown):string{if(typeof h!=='string'||h.length<10)throw new HttpError(400,'Please choose a valid HTML page.');if(new TextEncoder().encode(h).length>MAX_HTML_BYTES)throw new HttpError(400,'The page is too large. Use a page no larger than 20 MB.');return h;}
 export function validateName(n:unknown){if(typeof n!=='string'||!n.trim()||n.length>80)throw new HttpError(400,'Use a website name of 1–80 characters.');return n.trim();}

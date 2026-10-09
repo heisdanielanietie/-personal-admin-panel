@@ -21,6 +21,16 @@ const uploads=load('app/api/uploads/route.ts'),projects=load('app/api/projects/r
 let largest=0;
 global.fetch=async(url,options={})=>{largest=Math.max(largest,Buffer.byteLength(options.body||''));const req=new Request('https://test.local'+url,{...options,headers:{...options.headers,origin:'https://test.local'}}),method=options.method||'GET';const id=url.split('/')[3];if(url.startsWith('/api/uploads'))return uploads[method](req);if(url==='/api/projects')return projects[method](req);if(url.includes('/content?'))return content.GET(req,{params:Promise.resolve({id})});return project[method](req,{params:Promise.resolve({id})});};
 const {api,loadPageContent}=load('lib/project-client.ts');
+const {allowedRequestOrigin}=load('lib/request-origin.ts');
+process.env.STUDIO_ALLOWED_ORIGINS=JSON.stringify(['https://heisdanielwebdesk.netlify.app']);
+const proxyRequest=(origin,extra={})=>new Request('http://localhost:3000/api/uploads',{method:'POST',headers:{...(origin?{origin}:{}),...extra}});
+assert(allowedRequestOrigin(proxyRequest('https://heisdanielwebdesk.netlify.app')));
+assert(!allowedRequestOrigin(proxyRequest('https://attacker.example')));
+assert(!allowedRequestOrigin(proxyRequest('https://heisdanielwebdesk.netlify.app.attacker.example')));
+assert(!allowedRequestOrigin(proxyRequest('null')));
+assert(!allowedRequestOrigin(proxyRequest(null)));
+assert(!allowedRequestOrigin(proxyRequest('https://attacker.example',{'x-forwarded-host':'attacker.example'})));
+
 (async()=>{
  const html='<!doctype html>'+ 'x'.repeat(20_000_000-15);
  assert.equal(Buffer.byteLength(html),20_000_000);
