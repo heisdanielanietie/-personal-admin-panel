@@ -2,7 +2,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const ts=require('typescript');
-const records=new Map();let serial=0;let signedIn=true;
+const records=new Map();let serial=0;let signedIn=true;let accountId='owner';
 const blobStore={
  async get(k){return records.get(k)?.value??null;},
  async getWithMetadata(k){const r=records.get(k);return r?{data:r.value,etag:r.etag}:null;},
@@ -14,7 +14,7 @@ const blobStore={
 const cache={};
 function load(name){const file=path.resolve(__dirname,'..',name);if(cache[file])return cache[file].exports;const m={exports:{}};cache[file]=m;
  const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- function req(n){if(n==='@netlify/blobs')return {getStore:()=>blobStore,getDeployStore:()=>blobStore};if(n==='@/lib/auth')return {currentOwner:async()=>signedIn?{userId:'owner'}:null};if(n.startsWith('@/'))return load(n.slice(2)+'.ts');return require(n);}
+ function req(n){if(n==='@netlify/blobs')return {getStore:()=>blobStore,getDeployStore:()=>blobStore};if(n==='@/lib/auth')return {currentAccount:async()=>signedIn?{userId:accountId}:null};if(n.startsWith('@/'))return load(n.slice(2)+'.ts');return require(n);}
  new Function('require','module','exports',code)(req,m,m.exports);return m.exports;
 }
 const uploads=load('app/api/uploads/route.ts'),projects=load('app/api/projects/route.ts'),project=load('app/api/projects/[id]/route.ts'),content=load('app/api/projects/[id]/content/route.ts');
@@ -43,6 +43,15 @@ assert(!allowedRequestOrigin(proxyRequest('https://attacker.example',{'x-forward
  const uploadId=crypto.randomUUID();for(let index=0;index<15;index++)await global.fetch('/api/uploads',{method:'POST',body:JSON.stringify({uploadId,index,text:'€'.repeat(500000)})});
  const bad=await projects.POST(new Request('https://test.local/api/projects',{method:'POST',headers:{origin:'https://test.local'},body:JSON.stringify({name:'Oversize',uploadId,parts:15})}));assert.equal(bad.status,400);
  const incomplete=await projects.POST(new Request('https://test.local/api/projects',{method:'POST',headers:{origin:'https://test.local'},body:JSON.stringify({name:'Missing',uploadId:crypto.randomUUID(),parts:1})}));assert.equal(incomplete.status,400);
+ accountId='second-user';
+ assert.deepEqual((await api('')).projects,[]);
+ await assert.rejects(()=>api('/'+created.id),/not found/);
+ await assert.rejects(()=>api('/'+created.id,'PATCH',{action:'save',revision:loaded.revision,name:'Hijack',html:'<p>Hijacked</p>'}),/not found/);
+ await assert.rejects(()=>api('/'+created.id,'DELETE'),/not found/);
+ await assert.rejects(()=>loadPageContent(created.id,true),/not found/);
+ const second=await api('','POST',{name:'Second workspace',html:'<p>My private page</p>'});
+ assert.equal((await api('')).projects.length,1);
+ accountId='owner';await assert.rejects(()=>api('/'+second.id),/not found/);
  signedIn=false;assert.equal((await uploads.POST(new Request('https://test.local/api/uploads',{method:'POST',headers:{origin:'https://test.local'},body:'{}'}))).status,401);
- console.log('PASS: 20 MB import/reopen/save/publish; Unicode boundaries; bounded request sizes; cleanup; oversized and incomplete uploads; owner gate.');
+ console.log('PASS: 20 MB import/reopen/save/publish; Unicode boundaries; bounded request sizes; cleanup; oversized and incomplete uploads; authentication gate; independent accounts and cross-account access denied.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -1,23 +1,22 @@
 # Daniel Studio
 
-A private visual website editor. Production runs on **Netlify**, with source code on **GitHub**. It does not require ChatGPT Sites.
+A public visual website editor with private workspaces for each registered user. Production runs on **Netlify**, with source code on **GitHub**. It does not require ChatGPT Sites.
 
 ## Features
-- Import a self-contained HTML page or create a practice website.
+- Import a self-contained HTML page up to 20 MB or create a practice website.
 - Click text, buttons and images to edit; add text sections and images.
 - Desktop and mobile previews.
 - Durable drafts, private published copies and previous-publication restore.
 - Download the edited HTML for an external host.
-- Owner-only Netlify Identity login, email confirmation, recovery and sign-out.
+- Public registration with Netlify Identity login, email confirmation, recovery and sign-out.
 
 ## Deploy from this repository
 1. In Netlify, import this GitHub repository and select `main`.
 2. Netlify reads `netlify.toml`: build `pnpm run build`, publish `.next`, Node 22.
-3. Set `STUDIO_OWNER_EMAIL` to your own verified email in Netlify's environment variables (Functions and Builds scopes).
-4. Enable **Netlify Identity** in Project configuration → Identity. Keep email confirmation enabled. Either allow registration (the `identity-validate` function restricts it to the configured owner email) or choose Invite only and invite that address.
-5. Open the deployed website and create/confirm the owner account or accept the invitation. Passwords are set by the owner, never included in source control.
+3. Enable **Netlify Identity** and set Registration to **Open**. Keep email confirmation enabled.
+4. Anyone can create an account, confirm their email, and sign in. Passwords are set by users and never included in source control.
 
-The app denies access if the owner email is missing or the signed-in address does not match. Every data route checks ownership. A public login page does not make stored websites public.
+Every data route checks the signed-in user's ID. Project records, HTML versions and upload chunks are scoped to that ID. One account cannot read or change another account's files, including existing private projects. `STUDIO_OWNER_EMAIL` is no longer required or consulted.
 
 ## Storage and publishing
 Netlify Blobs stores the app's records and immutable HTML versions. Production uses a site-scoped store; non-production deployments use isolated deploy-scoped stores. Conditional writes reject stale edits. Publishing makes a private copy at `/p/{id}` and does not update an unrelated website automatically.
