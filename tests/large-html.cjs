@@ -1,0 +1,38 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const ts=require('typescript');
+const records=new Map();let serial=0;let signedIn=true;
+const blobStore={
+ async get(k){return records.get(k)?.value??null;},
+ async getWithMetadata(k){const r=records.get(k);return r?{data:r.value,etag:r.etag}:null;},
+ async set(k,value){records.set(k,{value,etag:String(++serial)});},
+ async setJSON(k,value,opts={}){const old=records.get(k);if(opts.onlyIfNew&&old||opts.onlyIfMatch&&old?.etag!==opts.onlyIfMatch)return {modified:false};await this.set(k,value);return {modified:true};},
+ async delete(k){records.delete(k);},
+ async list({prefix}){return {blobs:[...records.keys()].filter(k=>k.startsWith(prefix)).map(key=>({key}))};}
+};
+const cache={};
+function load(name){const file=path.resolve(__dirname,'..',name);if(cache[file])return cache[file].exports;const m={exports:{}};cache[file]=m;
+ const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ function req(n){if(n==='@netlify/blobs')return {getStore:()=>blobStore,getDeployStore:()=>blobStore};if(n==='@/lib/auth')return {currentOwner:async()=>signedIn?{userId:'owner'}:null};if(n.startsWith('@/'))return load(n.slice(2)+'.ts');return require(n);}
+ new Function('require','module','exports',code)(req,m,m.exports);return m.exports;
+}
+const uploads=load('app/api/uploads/route.ts'),projects=load('app/api/projects/route.ts'),project=load('app/api/projects/[id]/route.ts'),content=load('app/api/projects/[id]/content/route.ts');
+let largest=0;
+global.fetch=async(url,options={})=>{largest=Math.max(largest,Buffer.byteLength(options.body||''));const req=new Request('https://test.local'+url,{...options,headers:{...options.headers,origin:'https://test.local'}}),method=options.method||'GET';const id=url.split('/')[3];if(url.startsWith('/api/uploads'))return uploads[method](req);if(url==='/api/projects')return projects[method](req);if(url.includes('/content?'))return content.GET(req,{params:Promise.resolve({id})});return project[method](req,{params:Promise.resolve({id})});};
+const {api,loadPageContent}=load('lib/project-client.ts');
+(async()=>{
+ const html='<!doctype html>'+ 'x'.repeat(20_000_000-15);
+ assert.equal(Buffer.byteLength(html),20_000_000);
+ const created=await api('','POST',{name:'Large page',html});let loaded=await api('/'+created.id);assert.equal(loaded.html,html);
+ loaded=await api('/'+created.id,'PATCH',{action:'publish',revision:loaded.revision,name:loaded.name,html});assert.equal(await loadPageContent(created.id,true),html);
+ assert(largest<4_000_000);assert(![...records.keys()].some(k=>k.startsWith('uploads/')));
+ await assert.rejects(()=>api('','POST',{name:'Oversize',html:html+'x'}),/20 MB/);
+ const unicode='x'.repeat(499999)+'😀'+'é'.repeat(500000);const other=await api('','POST',{name:'Unicode',html:unicode});assert.equal((await api('/'+other.id)).html,unicode);
+ // Server validation cannot be bypassed by uploading oversized UTF-8 chunks.
+ const uploadId=crypto.randomUUID();for(let index=0;index<15;index++)await global.fetch('/api/uploads',{method:'POST',body:JSON.stringify({uploadId,index,text:'€'.repeat(500000)})});
+ const bad=await projects.POST(new Request('https://test.local/api/projects',{method:'POST',headers:{origin:'https://test.local'},body:JSON.stringify({name:'Oversize',uploadId,parts:15})}));assert.equal(bad.status,400);
+ const incomplete=await projects.POST(new Request('https://test.local/api/projects',{method:'POST',headers:{origin:'https://test.local'},body:JSON.stringify({name:'Missing',uploadId:crypto.randomUUID(),parts:1})}));assert.equal(incomplete.status,400);
+ signedIn=false;assert.equal((await uploads.POST(new Request('https://test.local/api/uploads',{method:'POST',headers:{origin:'https://test.local'},body:'{}'}))).status,401);
+ console.log('PASS: 20 MB import/reopen/save/publish; Unicode boundaries; bounded request sizes; cleanup; oversized and incomplete uploads; owner gate.');
+})().catch(e=>{console.error(e);process.exitCode=1;});
