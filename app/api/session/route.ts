@@ -1,3 +1,6 @@
-import {currentAccount} from '@/lib/auth';
+import {accountSession} from '@/lib/auth';
 export const dynamic='force-dynamic';
-export async function GET(){const owner=await currentAccount();return Response.json({authenticated:!!owner},{status:owner?200:401,headers:{'Cache-Control':'no-store'}});}
+export async function GET(){
+ const session=await accountSession();
+ return Response.json({authenticated:!!session.account,error:session.error},{status:session.status,headers:{'Cache-Control':'no-store'}});
+}

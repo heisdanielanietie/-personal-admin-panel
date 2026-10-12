@@ -10,7 +10,7 @@ const deploymentOrigins = [
 ].filter((value): value is string => Boolean(value)).map(value => new URL(value).origin);
 
 const nextConfig: NextConfig = {
-  env: { STUDIO_ALLOWED_ORIGINS: JSON.stringify([...new Set(deploymentOrigins)]) },
+  env: { STUDIO_IDENTITY_URL: new URL("/.netlify/identity", process.env.URL || "https://heisdanielwebdesk.netlify.app").href, STUDIO_ALLOWED_ORIGINS: JSON.stringify([...new Set(deploymentOrigins)]) },
 };
 
 export default nextConfig;
