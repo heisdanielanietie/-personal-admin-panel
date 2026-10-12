@@ -18,8 +18,8 @@ function load(name){const file=path.resolve(__dirname,'..',name);if(cache[file])
  new Function('require','module','exports',code)(req,m,m.exports);return m.exports;
 }
 const uploads=load('app/api/uploads/route.ts'),projects=load('app/api/projects/route.ts'),project=load('app/api/projects/[id]/route.ts'),content=load('app/api/projects/[id]/content/route.ts');
-let largest=0;
-global.fetch=async(url,options={})=>{largest=Math.max(largest,Buffer.byteLength(options.body||''));const req=new Request('https://test.local'+url,{...options,headers:{...options.headers,origin:'https://test.local'}}),method=options.method||'GET';const id=url.split('/')[3];if(url.startsWith('/api/uploads'))return uploads[method](req);if(url==='/api/projects')return projects[method](req);if(url.includes('/content?'))return content.GET(req,{params:Promise.resolve({id})});return project[method](req,{params:Promise.resolve({id})});};
+let largest=0;const requests=[];
+global.fetch=async(url,options={})=>{requests.push([url,options.method||'GET']);largest=Math.max(largest,Buffer.byteLength(options.body||''));const req=new Request('https://test.local'+url,{...options,headers:{...options.headers,origin:'https://test.local'}}),method=options.method||'GET';const id=url.split('/')[3];if(url.startsWith('/api/uploads'))return uploads[method](req);if(url==='/api/projects')return projects[method](req);if(url.includes('/content?'))return content.GET(req,{params:Promise.resolve({id})});return project[method](req,{params:Promise.resolve({id})});};
 const {api,loadPageContent}=load('lib/project-client.ts');
 const {allowedRequestOrigin}=load('lib/request-origin.ts');
 process.env.STUDIO_ALLOWED_ORIGINS=JSON.stringify(['https://heisdanielwebdesk.netlify.app']);
@@ -34,7 +34,7 @@ assert(!allowedRequestOrigin(proxyRequest('https://attacker.example',{'x-forward
 (async()=>{
  const html='<!doctype html>'+ 'x'.repeat(20_000_000-15);
  assert.equal(Buffer.byteLength(html),20_000_000);
- const created=await api('','POST',{name:'Large page',html});let loaded=await api('/'+created.id);assert.equal(loaded.html,html);
+ const created=await api('','POST',{name:'Large page',html});assert.equal(created.html,html);assert(!requests.some(([,method])=>method==='GET'));let loaded=await api('/'+created.id);assert.equal(loaded.html,html);
  loaded=await api('/'+created.id,'PATCH',{action:'publish',revision:loaded.revision,name:loaded.name,html});assert.equal(await loadPageContent(created.id,true),html);
  assert(largest<4_000_000);assert(![...records.keys()].some(k=>k.startsWith('uploads/')));
  await assert.rejects(()=>api('','POST',{name:'Oversize',html:html+'x'}),/20 MB/);
@@ -43,7 +43,14 @@ assert(!allowedRequestOrigin(proxyRequest('https://attacker.example',{'x-forward
  const uploadId=crypto.randomUUID();for(let index=0;index<15;index++)await global.fetch('/api/uploads',{method:'POST',body:JSON.stringify({uploadId,index,text:'€'.repeat(500000)})});
  const bad=await projects.POST(new Request('https://test.local/api/projects',{method:'POST',headers:{origin:'https://test.local'},body:JSON.stringify({name:'Oversize',uploadId,parts:15})}));assert.equal(bad.status,400);
  const incomplete=await projects.POST(new Request('https://test.local/api/projects',{method:'POST',headers:{origin:'https://test.local'},body:JSON.stringify({name:'Missing',uploadId:crypto.randomUUID(),parts:1})}));assert.equal(incomplete.status,400);
+ const child=await api('','POST',{name:'Contact',filename:'contact-form.html',workspaceId:created.id,html:'<h1>Contact</h1>'});
+ const third=await api('','POST',{name:'About',filename:'about.html',workspaceId:child.id,html:'<h1>About</h1>'});
+ assert.equal(child.workspaceId,created.id);assert.equal(third.workspaceId,created.id);
+ assert.equal((await api('')).projects.filter(p=>p.workspaceId===created.id).length,3);
+ await assert.rejects(()=>api('','POST',{name:'Duplicate',filename:'about.html',workspaceId:created.id,html:'<h1>Duplicate</h1>'}),/already has/);
+ await assert.rejects(()=>api('','POST',{name:'Invalid',filename:'../escape.html',workspaceId:created.id,html:'<h1>Invalid</h1>'}),/filename/);
  accountId='second-user';
+ await assert.rejects(()=>api('','POST',{name:'Unauthorized',filename:'hack.html',workspaceId:created.id,html:'<h1>Denied</h1>'}),/not found/);
  assert.deepEqual((await api('')).projects,[]);
  await assert.rejects(()=>api('/'+created.id),/not found/);
  await assert.rejects(()=>api('/'+created.id,'PATCH',{action:'save',revision:loaded.revision,name:'Hijack',html:'<p>Hijacked</p>'}),/not found/);
@@ -53,5 +60,5 @@ assert(!allowedRequestOrigin(proxyRequest('https://attacker.example',{'x-forward
  assert.equal((await api('')).projects.length,1);
  accountId='owner';await assert.rejects(()=>api('/'+second.id),/not found/);
  signedIn=false;assert.equal((await uploads.POST(new Request('https://test.local/api/uploads',{method:'POST',headers:{origin:'https://test.local'},body:'{}'}))).status,401);
- console.log('PASS: 20 MB import/reopen/save/publish; Unicode boundaries; bounded request sizes; cleanup; oversized and incomplete uploads; authentication gate; independent accounts and cross-account access denied.');
+ console.log('PASS: 20 MB import/reopen/save/publish; Unicode boundaries; bounded request sizes; cleanup; oversized and incomplete uploads; three-page workspaces and filenames; no redundant download on save; authentication gate; independent accounts and cross-account access denied.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

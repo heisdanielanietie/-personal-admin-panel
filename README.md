@@ -39,3 +39,8 @@ npx netlify dev
 ```
 
 Netlify Identity must be tested on a deployed Netlify site. No credentials, generated output or node_modules should be committed.
+
+## Multi-page editing
+Select several HTML files when adding a website, or choose **Add HTML pages** inside an existing website. Each page supports 20 MB. Use the original hosting filenames (usually `index.html` and `contact-form.html`); rename browser-added copy suffixes in the import dialog if needed. Page tabs save the current draft before switching. Download ZIP exports all pages; private publication applies to the current page. Hidden Netlify form definitions are preserved, but imported JavaScript is removed and forms cannot submit inside the editor. Deploy the extracted files to their intended host for live form processing.
+
+The frame uses `sandbox="allow-same-origin"` without `allow-scripts`, plus `script-src 'none'`. Only trusted parent-app code attaches the selection and editing listeners. Upload/download chunks use batches of four with 45-second request timeouts. Saves reuse local HTML instead of downloading it again.
