@@ -44,3 +44,12 @@ Netlify Identity must be tested on a deployed Netlify site. No credentials, gene
 Select several HTML files when adding a website, or choose **Add HTML pages** inside an existing website. Each page supports 20 MB. Use the original hosting filenames (usually `index.html` and `contact-form.html`); rename browser-added copy suffixes in the import dialog if needed. Page tabs save the current draft before switching. Download ZIP exports all pages; private publication applies to the current page. Hidden Netlify form definitions are preserved, but imported JavaScript is removed and forms cannot submit inside the editor. Deploy the extracted files to their intended host for live form processing.
 
 The frame uses `sandbox="allow-same-origin"` without `allow-scripts`, plus `script-src 'none'`. Only trusted parent-app code attaches the selection and editing listeners. Upload/download chunks use batches of four with 45-second request timeouts. Saves reuse local HTML instead of downloading it again.
+
+## Expanded editing controls
+Click an element and use **Select parent** or **Select enclosing section** for containers. The inspector includes typography, link destinations, backgrounds, dimensions, image fit/crop focus, spacing, column proportions, duplication, movement and deletion. Image crops use CSS `object-fit`; original image bytes remain unchanged. Column presets stack at 600px and below and the responsive CSS is included in exports. Fixed sizes can still affect responsive layouts; check Phone view before exporting.
+
+Undo/redo keeps the latest 60 editing actions for the open page, including structural changes. Switching/reopening pages or reconnecting the editor resets that history. Save draft persists the resulting HTML, not the undo history. Text replacement flattens inline formatting in the selected text element, and undo restores its original child nodes. Container text replacement is blocked. Duplicated elements receive fresh IDs and matching internal label/ARIA/fragment references.
+
+This update adds no third-party services. Accounts use Netlify Identity and uploaded HTML remains in account-scoped Netlify Blobs. Remote images, backgrounds and fonts referenced by a user's HTML can contact their original providers. The editor adds no marketing mail or subscription billing.
+
+Controller regression checks (optional jsdom installation): `STUDIO_TEST_JSDOM=/path/to/node_modules/jsdom node tests/editor-controls.cjs`. These are DOM tests, not a signed-in browser end-to-end test.
