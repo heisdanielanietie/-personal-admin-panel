@@ -101,3 +101,11 @@
 
 /* Expanded visual editing controls */
 .advanced-fields{border:0;padding:0 18px 18px;margin:0;min-width:0}.advanced-fields details{border-bottom:1px solid #e4eaf3;padding:16px 0}.advanced-fields summary{font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px}.advanced-fields label{display:block;font-size:12px;margin:12px 0}.advanced-fields select{display:block;width:100%;min-width:0;border:1px solid #dbe1eb;border-radius:8px;padding:10px 8px;margin-top:7px;background:#fff;color:#152039;font:inherit}.advanced-fields .field-row label{min-width:0;flex:1}.selection-path{padding:15px 0;display:flex;align-items:center;flex-wrap:wrap;gap:10px}.selection-path strong{background:#edf3ff;color:#275cf4;border-radius:5px;padding:3px 8px}.selection-path .secondary{padding:7px 10px;font-size:12px;min-height:34px}.selection-path .text-btn{width:100%}.control-buttons{display:flex;flex-wrap:wrap;gap:7px}.control-buttons .secondary{padding:8px 10px;font-size:12px;min-height:34px}.danger-text{color:#b42318}.history-buttons{display:flex;gap:5px}.history-buttons .secondary{padding:6px 10px;min-height:34px;font-size:12px}.editor-toolbar{height:auto;min-height:66px;flex-wrap:wrap;padding-block:10px}.inspector{max-height:calc(100dvh - 30px);overflow-y:auto;position:sticky;top:10px}.editor-layout{grid-template-columns:minmax(0,1fr) 330px}.preview-mode{grid-template-columns:1fr}.advanced-fields:disabled{opacity:.65}@media(max-width:700px){.editor-layout{display:flex}.inspector{position:static;max-height:none}.editor-toolbar{gap:8px}.history-buttons{margin-left:auto}.device-buttons{margin-left:0}.advanced-fields{padding-inline:20px}}
+
+/* Keep the inspector and canvas independently usable in short desktop windows. */
+.editor-layout:not(.preview-mode){grid-template-columns:minmax(0,1fr) 360px}
+.inspector{min-width:0;min-height:0;max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;position:sticky;top:16px}
+.inspector-heading{position:sticky;top:0;z-index:3;background:#fff;padding:18px 20px}
+.inspector .inspector-block{padding:22px 20px}
+.inspector .inspector-block>label{display:block}
+@media(max-width:700px){.inspector{position:static;max-height:70dvh;overflow-y:auto}.editor-layout:not(.preview-mode){display:flex}.inspector-heading{padding:16px 18px}}

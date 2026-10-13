@@ -1,0 +1,34 @@
+.panel {border:0; padding:0 20px 24px; margin:0; min-width:0; width:100%; color:#24334c;}
+.panel:disabled {opacity:.65;}
+.panel *, .panel *::before, .panel *::after {box-sizing:border-box;}
+.panel [hidden] {display:none !important;}
+.selection {display:grid; grid-template-columns:minmax(0,1fr); gap:10px; padding:20px 0;}
+.element {display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#69768c;}
+.element strong {font-size:12px; color:#275cf4; background:#edf3ff; padding:4px 10px; border-radius:6px;}
+.panel .selection button {width:100%; justify-content:flex-start; min-height:40px; font-size:13px; padding:10px 12px; white-space:normal;}
+.tabs {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; background:#edf1f7; padding:4px; border-radius:10px; margin:0 0 20px;}
+.tabs button {border:0; border-radius:7px; background:transparent; color:#637189; padding:11px 4px; font-size:13px; font-weight:600; min-width:0;}
+.tabs button[aria-pressed=true] {background:white; color:#275cf4; box-shadow:0 1px 4px #162b4f16;}
+.category {display:grid; gap:12px;}
+.group {border:1px solid #e0e6ef; border-radius:10px; overflow:hidden; background:white;}
+.group h3 {margin:0; font-size:13px; font-weight:650;}
+.group h3 button {display:flex; justify-content:space-between; align-items:center; width:100%; gap:12px; border:0; padding:15px 14px; background:#f8faff; color:#24334c; text-align:left; font:inherit;}
+.group h3 button[aria-expanded=true] {border-bottom:1px solid #e5eaf2;}
+.group h3 button span {font-size:18px; color:#657692;}
+.groupBody {padding:16px 14px; display:flex; flex-direction:column; gap:16px; min-width:0;}
+.panel label {display:flex; flex-direction:column; gap:8px; margin:0; font-size:12px; line-height:1.5; font-weight:600; min-width:0; overflow-wrap:anywhere;}
+.panel input:not([type=file]), .panel select, .panel textarea {width:100%; min-width:0; margin:0; padding:10px; min-height:40px; border:1px solid #dbe2ed; border-radius:7px; background:white; color:#24334c; font-size:13px; line-height:1.5;}
+.panel input[type=color] {height:40px; padding:5px; cursor:pointer;}
+.panel textarea {min-height:115px; resize:vertical;}
+.panel :global(.field-row) {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:0;}
+.panel :global(.field-row) label {width:100%;}
+.panel :global(.field-note), .empty {margin:0; font-size:12px; font-weight:400; line-height:1.7; color:#718098; overflow-wrap:anywhere;}
+.empty {padding:16px; border:1px solid #e0e6ef; border-radius:10px; background:#f8faff;}
+.panel :global(.text-btn) {display:block; align-self:flex-start; text-align:left; font-size:12px; line-height:1.6; padding:2px 0; white-space:normal;}
+.panel :global(.upload-label) {display:flex; flex-direction:row; align-items:center; justify-content:center; padding:11px; margin:0;}
+.panel :global(.control-buttons) {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
+.panel :global(.control-buttons) button {width:100%; padding:10px 6px; min-height:40px; font-size:12px; white-space:normal; text-transform:capitalize;}
+.deleteArea {padding-top:16px; border-top:1px solid #e7ebf2;}
+.panel .deleteArea button {width:100%; color:#b42318; border-color:#f0c7c3; background:#fff8f7; white-space:normal; font-size:12px; padding:11px;}
+.panel button:focus-visible, .panel select:focus-visible {outline:3px solid #7095ff; outline-offset:2px;}
+@media(max-width:700px) {.panel {padding-inline:18px;}.selection {grid-template-columns:1fr 1fr;}.element {grid-column:1/-1;}.panel .selection button {justify-content:center;} }
