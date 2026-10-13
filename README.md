@@ -53,3 +53,12 @@ Undo/redo keeps the latest 60 editing actions for the open page, including struc
 This update adds no third-party services. Accounts use Netlify Identity and uploaded HTML remains in account-scoped Netlify Blobs. Remote images, backgrounds and fonts referenced by a user's HTML can contact their original providers. The editor adds no marketing mail or subscription billing.
 
 Controller regression checks (optional jsdom installation): `STUDIO_TEST_JSDOM=/path/to/node_modules/jsdom node tests/editor-controls.cjs`. These are DOM tests, not a signed-in browser end-to-end test.
+
+## Canvas workbench
+The Layers / Insert panel is collapsed initially to leave room for the canvas, and Properties can also be collapsed. Layers lists up to 2,000 HTML elements with search, branch collapse, selection, names, hide and lock. Locked containers protect descendants from editing; unlock the container in Layers. Layer names and locks persist in `data-studio-*` attributes; hidden uses HTML `hidden` and affects export. Layer locking is an editing aid, not an access-control mechanism.
+
+Canvas controls provide zoom, fit, hand panning and desktop/tablet/phone viewport widths (1200/768/375px). The bottom-right resize handle changes width and height as one undoable action. Fixed pixel resizing may need further responsive adjustments. This is an HTML layout editor, not unrestricted vector drawing or Figma file import.
+
+Insert adds text, headings, containers, dividers, rectangles, circles, buttons, sections and images. Design includes borders, shadow presets, opacity and two-colour gradients. Auto Layout applies wrapping flex rows or columns with alignment, distribution and gap controls. Page styles store up to 30 named colour or typography presets in page metadata, so saving/exporting preserves them. They apply by value, not as live-linked global styles. Scripts remain disabled and resize handles/selection labels are excluded from exports.
+
+The Daniel Studio login and workspace display a copyright footer. User-uploaded pages are not branded. No new data recipients, billing or marketing features are introduced by these controls.

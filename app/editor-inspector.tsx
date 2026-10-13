@@ -12,6 +12,7 @@ function ValueInput({value,onCommit,placeholder}:{value:string;onCommit:(value:s
 }
 export function EditorInspector({selection:s,field,send,imageFile,busy}:{selection:EditorSelection;field:(key:string,value:string|number)=>void;send:(data:unknown)=>void;imageFile:(file?:File,replace?:boolean)=>void;busy:boolean}){
  const st=s.styles;
+ const [gradientFrom,setGradientFrom]=useState('#275cf4'),[gradientTo,setGradientTo]=useState('#9b5cf6');
  const [tab,setTab]=useState<'content'|'design'|'layout'>(s.canText||s.tag==='IMG'?'content':'design');
  const [openGroup,setOpenGroup]=useState(s.canText?'text':s.tag==='IMG'?'image':'background');
  const changeTab=(next:'content'|'design'|'layout')=>{setTab(next);setOpenGroup(next==='content'?(s.canText?'text':s.tag==='IMG'?'image':'link'):next==='design'?'background':'size');};
@@ -20,7 +21,7 @@ export function EditorInspector({selection:s,field,send,imageFile,busy}:{selecti
  const styleInput=(label:string,key:string,placeholder='auto')=><label>{label}<ValueInput value={st[key]||''} placeholder={placeholder} onCommit={v=>{if(!v||CSS.supports(key.replace(/[A-Z]/g,m=>'-'+m.toLowerCase()),v))field(key,v);else toast.error('Use a valid value, such as 24px, 50% or auto.');}}/></label>;
  const choice=(label:string,key:string,options:[string,string][])=> <label>{label}<select value={st[key]||''} onChange={e=>field(key,e.target.value)}><option value={st[key]||''}>Current: {st[key]||'default'}</option>{options.map(([v,t])=><option key={v} value={v}>{t}</option>)}</select></label>;
  const colour=(label:string,key:string)=><label>{label}<input type="color" value={hex(st[key]||'')} onChange={e=>field(key,e.target.value)}/></label>;
- return <fieldset className={ui.panel} disabled={busy}>
+ return <fieldset className={ui.panel} disabled={busy||s.locked}>
   <div className={ui.selection}><span className={ui.element}>Selected element <strong>{s.tag.toLowerCase()}</strong></span><button className="secondary" disabled={!s.canParent} onClick={()=>send({type:'parent'})}>Select parent ↑</button><button className="secondary" onClick={()=>send({type:'select-section'})}>Select enclosing section</button></div>
   <nav className={ui.tabs} aria-label="Editing categories">{(['content','design','layout'] as const).map(t=><button key={t} type="button" aria-pressed={tab===t} onClick={()=>changeTab(t)}>{t[0].toUpperCase()+t.slice(1)}</button>)}</nav>
   <div className={ui.category} hidden={tab!=='content'}>
@@ -44,7 +45,15 @@ export function EditorInspector({selection:s,field,send,imageFile,busy}:{selecti
   {group('background','Background',<>{colour('Background colour','backgroundColor')}<button className="text-btn" onClick={()=>field('backgroundColor','transparent')}>Transparent background</button>
    <label>Background image URL<ValueInput value={st.backgroundImage?.startsWith('url(')?st.backgroundImage.slice(4,-1).replace(/^["']|["']$/g,''):''} placeholder="https://…" onCommit={v=>{if(!v||safeUrl(v,true))field('backgroundImage',v);else toast.error('Use a full HTTPS image URL.');}}/></label>
 </>)}
-  {group('corners','Corners',<>{styleInput('Rounded corners','borderRadius','12px')}</>)}
+  {group('effects','Borders & effects',<>
+   <div className="field-row">{styleInput('Border width','borderWidth','1px')}{choice('Border style','borderStyle',[['none','None'],['solid','Solid'],['dashed','Dashed'],['dotted','Dotted']])}</div>
+   {colour('Border colour','borderColor')}
+   {choice('Shadow','boxShadow',[['none','None'],['0 4px 16px rgba(15,23,42,.12)','Soft'],['0 12px 32px rgba(15,23,42,.22)','Elevated'],['0 2px 4px rgba(15,23,42,.18)','Subtle']])}
+   <label>Opacity<input type="range" min="0" max="1" step="0.05" value={st.opacity||'1'} onChange={e=>field('opacity',e.target.value)}/><span>{Math.round(Number(st.opacity||1)*100)}%</span></label>
+   <div className="field-row"><label>Gradient start<input type="color" value={gradientFrom} onChange={e=>setGradientFrom(e.target.value)}/></label><label>Gradient end<input type="color" value={gradientTo} onChange={e=>setGradientTo(e.target.value)}/></label></div>
+   <button className="secondary" onClick={()=>send({type:'gradient',from:gradientFrom,to:gradientTo})}>Apply gradient</button>
+  </>)}
+  {group('corners' ,'Corners',<>{styleInput('Rounded corners','borderRadius','12px')}</>)}
   {s.tag==='IMG'&&group('crop','Image crop & alignment',<>   {choice('Fit inside image box','objectFit',[['contain','Show full image'],['cover','Crop to fill'],['fill','Stretch'],['none','Original size']])}
    {choice('Crop focus','objectPosition',[['center','Centre'],['top','Top'],['bottom','Bottom'],['left','Left'],['right','Right']])}
    <p className="field-note">Set width and height in Layout, then choose Crop to fill. The original image stays intact.</p>
@@ -58,7 +67,15 @@ export function EditorInspector({selection:s,field,send,imageFile,busy}:{selecti
    <p className="field-note">Use % widths for flexible layouts. Check Phone view after resizing.</p>
   </>)}
   {group('spacing','Spacing',<><div className="field-row">{styleInput('Padding top','paddingTop','24px')}{styleInput('Padding bottom','paddingBottom','24px')}</div><div className="field-row">{styleInput('Padding left','paddingLeft','24px')}{styleInput('Padding right','paddingRight','24px')}</div><div className="field-row">{styleInput('Margin top','marginTop','0px')}{styleInput('Margin bottom','marginBottom','0px')}</div></>)}
-  {group('columns','Columns',<>{styleInput('Column / row gap','gap','24px')}{s.isColumns&&s.columns>=2&&s.columns<=6?<><label>First column width<select defaultValue="" key={st.gridTemplateColumns} onChange={e=>send({type:'columns',value:Number(e.target.value)})}><option value="" disabled>Choose proportion…</option>{[25,33,50,66,75].map(n=><option key={n} value={n}>{n}% · rest share remaining space</option>)}</select></label><p className="field-note">Columns stack automatically at widths of 600px and below. Check Phone view after changing the layout.</p></>:<p className="field-note">Select the parent of a column to adjust the column proportions.</p>}{styleInput('Selected flex column basis','flexBasis','auto')}</>)}
+  {group('auto-layout','Auto layout',<>
+   <div className="control-buttons"><button className="secondary" onClick={()=>send({type:'auto-layout',value:'row'})}>Row</button><button className="secondary" onClick={()=>send({type:'auto-layout',value:'column'})}>Column</button></div>
+   {choice('Align items','alignItems',[['flex-start','Start'],['center','Centre'],['flex-end','End'],['stretch','Stretch']])}
+   {choice('Distribute items','justifyContent',[['flex-start','Start'],['center','Centre'],['flex-end','End'],['space-between','Space between'],['space-around','Space around'],['space-evenly','Evenly']])}
+   {choice('Wrap','flexWrap',[['wrap','Wrap onto next line'],['nowrap','Single line']])}
+   {styleInput('Gap','gap','16px')}
+   <p className="field-note">Applies to the selected container. Row layouts wrap by default to fit smaller screens.</p>
+  </>)}
+  {group('columns' ,'Columns',<>{styleInput('Column / row gap','gap','24px')}{s.isColumns&&s.columns>=2&&s.columns<=6?<><label>First column width<select defaultValue="" key={st.gridTemplateColumns} onChange={e=>send({type:'columns',value:Number(e.target.value)})}><option value="" disabled>Choose proportion…</option>{[25,33,50,66,75].map(n=><option key={n} value={n}>{n}% · rest share remaining space</option>)}</select></label><p className="field-note">Columns stack automatically at widths of 600px and below. Check Phone view after changing the layout.</p></>:<p className="field-note">Select the parent of a column to adjust the column proportions.</p>}{styleInput('Selected flex column basis','flexBasis','auto')}</>)}
   {group('arrange','Arrange',<><div className="control-buttons"><button className="secondary" disabled={!s.canMoveUp} onClick={()=>send({type:'structure',action:'up'})}>Move up</button><button className="secondary" disabled={!s.canMoveDown} onClick={()=>send({type:'structure',action:'down'})}>Move down</button><button className="secondary" onClick={()=>send({type:'structure',action:'duplicate'})}>Duplicate</button></div><div className={ui.deleteArea}><button className="secondary danger-text" onClick={()=>{if(window.confirm('Delete this '+s.tag.toLowerCase()+' and its contents? You can undo this while this page stays open.'))send({type:'structure',action:'delete'});}}>Delete selected element</button></div><p className="field-note">Select the enclosing section to move, copy or remove the whole section.</p></>)}
   </div>
  </fieldset>;

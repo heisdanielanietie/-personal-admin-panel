@@ -1,0 +1,24 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),ts=require('typescript');
+const {JSDOM}=require(process.env.STUDIO_TEST_JSDOM||'jsdom');
+const m={exports:{}};new Function('exports',ts.transpileModule(fs.readFileSync('lib/editor.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(m.exports);
+global.DOMParser=new JSDOM('').window.DOMParser;
+const {editorDocument,connectEditor,cleanHtml}=m.exports,dom=new JSDOM(editorDocument('<!doctype html><html><head></head><body><section id="hero"><h1>Hello</h1><p>Text</p></section></body></html>','test')),d=dom.window.document,events=[];
+const c=connectEditor(d,e=>events.push(e)),last=t=>events.filter(e=>e.type===t).at(-1),send=(type,rest={})=>c.send({type,...rest});
+const row=last('layers').layers.find(l=>l.name==='hero');send('select-layer',{id:row.id});assert.equal(last('selection').tag,'SECTION');
+send('layer-meta',{action:'rename',value:'Hero panel'});assert.equal(d.querySelector('section').getAttribute('data-studio-name'),'Hero panel');
+send('layer-meta',{action:'hide'});assert(d.querySelector('section').hidden);send('undo');assert(!d.querySelector('section').hidden);
+send('layer-meta',{action:'lock'});assert(last('selection').locked);send('update',{field:'paddingTop',value:'100px'});assert.equal(d.querySelector('section').style.paddingTop,'');
+const heading=last('layers').layers.find(l=>l.tag==='H1');send('select-layer',{id:heading.id});assert(last('selection').locked);send('update',{field:'text',value:'No'});assert.equal(d.querySelector('h1').textContent,'Hello');
+send('select-layer',{id:row.id});send('layer-meta',{action:'lock'});assert(!last('selection').locked);
+send('auto-layout',{value:'row'});assert.equal(d.querySelector('section').style.flexWrap,'wrap');assert.equal(d.querySelector('section').style.display,'flex');
+send('gradient',{from:'#275cf4',to:'#9b5cf6'});assert(d.querySelector('section').style.backgroundImage.includes('linear-gradient'));
+send('insert',{kind:'rectangle'});const rectangle=d.querySelector('[data-studio-name="rectangle"]');assert(rectangle);send('undo');assert(!rectangle.isConnected);send('redo');assert(rectangle.isConnected);
+send('update',{field:'opacity',value:'0.5'});assert.equal(rectangle.style.opacity,'0.5');send('update',{field:'boxShadow',value:'0 4px 16px rgba(0,0,0,.12)'});assert(rectangle.style.boxShadow);
+send('save-style',{kind:'colours',name:'Brand palette'});assert.equal(last('presets').presets[0].name,'Brand palette');
+send('select-layer',{id:heading.id});send('apply-style',{index:0});assert(d.querySelector('h1').style.backgroundColor);
+// Resize is one undoable operation, and overlays are never exported.
+const h=d.querySelector('h1');h.getBoundingClientRect=()=>({width:100,height:40,right:100,bottom:40,left:0,top:0});
+const handle=d.querySelector('button[data-ds-system]');handle.dispatchEvent(new dom.window.MouseEvent('pointerdown',{clientX:100,clientY:40,bubbles:true}));handle.dispatchEvent(new dom.window.MouseEvent('pointermove',{clientX:160,clientY:70,bubbles:true}));handle.dispatchEvent(new dom.window.MouseEvent('pointerup',{bubbles:true}));assert.equal(h.style.width,'160px');assert.equal(h.style.height,'70px');send('undo');assert.equal(h.style.width,'');
+const exported=cleanHtml(last('changed').html);assert(!exported.includes('data-ds-system'));assert(!exported.includes('Resize selected element'));assert(exported.includes('studio-style-presets'));assert(exported.includes('Hero panel'));
+c.destroy();const reopened=new JSDOM(editorDocument(exported,'test'));const events2=[];const c2=connectEditor(reopened.window.document,e=>events2.push(e));assert.equal(events2.find(e=>e.type==='presets').presets[0].name,'Brand palette');c2.destroy();reopened.window.close();dom.window.close();
+console.log('PASS: layers, rename/hide/lock, ancestor locking, insertion, responsive flex, gradients/effects, persisted styles, resize undo and clean export.');
