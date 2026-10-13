@@ -68,4 +68,12 @@ Choose **Drag: Layout** to reorder siblings in their current container, or **Dra
 
 The upload picker accepts standard stored/deflated ZIPs up to 20 MB, with up to 500 entries and 60 MB uncompressed total. ZIP64, encrypted archives, symbolic links, duplicate names, unsafe paths and damaged content are rejected. HTML folder paths are retained; local image/font assets and CSS are embedded in each HTML page rather than stored as separate files. Each prepared page must fit the 20 MB limit. Missing/unsupported referenced assets are reported. JavaScript and embedded frames remain unsupported, and this imports static website output, not source projects requiring a build. Exported ZIPs contain self-contained HTML pages at their retained paths.
 
-**Dark editor / Light editor** changes only the editor and is remembered on the browser. **Page settings → Website appearance** changes the uploaded page's base background/text and is undoable; custom section backgrounds still need individual adjustment. Insert now includes a visual picker for rectangles, rounded rectangles, circles, ellipses, triangles, lines and arrows.
+**Dark mode / Light mode** changes only the editor and is remembered on the browser. **Page settings → Website appearance** changes the uploaded page's base background/text and is undoable; custom section backgrounds still need individual adjustment. Insert now includes a visual picker for rectangles, rounded rectangles, circles, ellipses, triangles, lines and arrows.
+
+
+## Drawing toolbox
+The slim toolbox provides Select/Move, Shape Edit, Rectangle, Ellipse, Line, Freehand, Text and Hand. Choose a drawing tool, then drag on the page; Text also supports a click. Drawing returns to Select automatically. Select a shape and open Design → Shape editing for fill, outline, dimensions, rotation and rectangle corner rounding. Freehand paths support open/closed outlines, fill and editable points through Shape Edit or point coordinates. Reset rotation to zero before dragging vector points.
+
+Delete or Backspace removes the selected unlocked object when you are not typing in a field. Undo restores it. Drawing, point editing and deletion participate in undo/redo; SVG paths survive save and export. The app-level theme includes dialogs and the login page, persists when browser storage is available, and never changes the imported page.
+
+Drawing regression checks: `STUDIO_TEST_JSDOM=/path/to/node_modules/jsdom node tests/editor-drawing.cjs`.

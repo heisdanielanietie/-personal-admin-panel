@@ -1,0 +1,14 @@
+/* The theme belongs to the document so portalled dialogs share it. Iframes are separate documents. */
+html[data-studio-theme=light]{--studio-surface:#fff;--studio-bg:#f5f7fb;--studio-text:#172039;--studio-muted:#718096;--studio-border:#dce3ef;--studio-input:#fff;--studio-active:#eaf0ff;--studio-accent:#275cf4}
+html[data-studio-theme=dark]{--studio-surface:#182235;--studio-bg:#0e1625;--studio-text:#e6edf8;--studio-muted:#b0bed2;--studio-border:#3d4e67;--studio-input:#233249;--studio-active:#314a75;--studio-accent:#9fbaff}
+html[data-studio-theme] body,html[data-studio-theme] .studio,html[data-studio-theme] .login-page{background:var(--studio-bg)!important;color:var(--studio-text)!important}
+html[data-studio-theme] :is(.topbar,.editor-bar,.editor-toolbar,.inspector,.inspector-heading,.studio-copyright,.canvas-browser,.project-card,.login-card,.tool-rail,[data-slot=dialog-content],[data-slot=alert-dialog-content]){background:var(--studio-surface)!important;color:var(--studio-text)!important;border-color:var(--studio-border)!important}
+html[data-studio-theme] .studio aside,html[data-studio-theme] .studio aside :is(fieldset,section,nav,h3,button,label,strong){background-color:var(--studio-surface)!important;color:var(--studio-text)!important;border-color:var(--studio-border)!important}
+html[data-studio-theme] :is(.studio,.login-page,[data-slot=dialog-content],[data-slot=alert-dialog-content]) :is(input:not([type=color]),textarea,select,.secondary){background:var(--studio-input)!important;color:var(--studio-text)!important;border-color:var(--studio-border)!important}
+html[data-studio-theme] :is(.studio,.login-page,[data-slot=dialog-content],[data-slot=alert-dialog-content]) :is(.field-note,.help-btn,.brand,.text-btn,.save-state,.inspector-foot){color:var(--studio-muted)!important}
+html[data-studio-theme] .studio aside p{color:var(--studio-muted)!important}
+html[data-studio-theme] .studio :is(aside,.tool-rail) button[aria-pressed=true]{background:var(--studio-active)!important;color:var(--studio-accent)!important}
+html[data-studio-theme] :is(.canvas-viewport,.page-tabs){background:var(--studio-bg)!important;border-color:var(--studio-border)!important}
+html[data-studio-theme=dark] :is(.dialog-note,.file-drop,.login-message,.add-card,.error-box,.loading){background:#233249!important;color:#dce5f4!important;border-color:#3d4e67!important}
+html[data-studio-theme=dark] [data-slot$=description]{color:#b0bed2!important}
+.studio-theme-button{border:1px solid var(--studio-border,#dce3ef);border-radius:8px;background:var(--studio-input,#fff);color:var(--studio-text,#172039);font-size:13px;min-height:38px;padding:8px 12px;white-space:nowrap}.studio-theme-button:focus-visible{outline:3px solid #7095ff;outline-offset:3px}.login-card>.studio-theme-button{display:block;margin:0 0 24px auto}

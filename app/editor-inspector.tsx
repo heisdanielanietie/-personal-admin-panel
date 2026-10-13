@@ -10,8 +10,11 @@ function ValueInput({value,onCommit,placeholder}:{value:string;onCommit:(value:s
  const [draft,setDraft]=useState(value);useEffect(()=>setDraft(value),[value]);
  return <input value={draft} placeholder={placeholder} onChange={e=>setDraft(e.target.value)} onBlur={()=>{if(draft!==value)onCommit(draft);}} onKeyDown={e=>{if(e.key==='Enter')e.currentTarget.blur();if(e.key==='Escape'){e.preventDefault();setDraft(value);}}}/>;
 }
-export function EditorInspector({selection:s,field,send,imageFile,busy}:{selection:EditorSelection;field:(key:string,value:string|number)=>void;send:(data:unknown)=>void;imageFile:(file?:File,replace?:boolean)=>void;busy:boolean}){
+export function EditorInspector({selection:s,field,send,imageFile,busy,shapeEdit=false}:{shapeEdit?:boolean;selection:EditorSelection;field:(key:string,value:string|number)=>void;send:(data:unknown)=>void;imageFile:(file?:File,replace?:boolean)=>void;busy:boolean}){
  const st=s.styles;
+ const [pointIndex,setPointIndex]=useState(0);
+ useEffect(()=>{if(shapeEdit){setTab('design');setOpenGroup('shape');}},[shapeEdit]);
+ useEffect(()=>setPointIndex(0),[s.layerId]);
  const [gradientFrom,setGradientFrom]=useState('#275cf4'),[gradientTo,setGradientTo]=useState('#9b5cf6');
  const [tab,setTab]=useState<'content'|'design'|'layout'>(s.canText||s.tag==='IMG'?'content':'design');
  const [openGroup,setOpenGroup]=useState(s.canText?'text':s.tag==='IMG'?'image':'background');
@@ -35,6 +38,22 @@ export function EditorInspector({selection:s,field,send,imageFile,busy}:{selecti
   {!s.canText&&s.tag!=='IMG'&&s.tag!=='A'&&<p className={ui.empty}>This is a container. Select text or an image inside it to change its content, or use Design and Layout to style the container.</p>}
   </div>
   <div className={ui.category} hidden={tab!=='design'}>
+  {group('shape','Shape editing',<>
+   {s.vector?<>
+    <label>Path type<select value={s.vector.closed?'closed':'open'} onChange={e=>send({type:'vector-update',field:'closed',value:e.target.value==='closed'})}><option value="open">Open line</option><option value="closed">Closed shape</option></select></label>
+    <div className="field-row"><label>Fill<input type="color" value={hex(s.vector.fill)} onChange={e=>send({type:'vector-update',field:'fill',value:e.target.value})}/></label><label>Outline<input type="color" value={hex(s.vector.stroke)} onChange={e=>send({type:'vector-update',field:'stroke',value:e.target.value})}/></label></div>
+    <label>Outline width<input type="number" min="0" max="100" value={s.vector.strokeWidth} onChange={e=>send({type:'vector-update',field:'strokeWidth',value:Number(e.target.value)})}/></label>
+    <label>Edit point<select value={Math.min(pointIndex,s.vector.points.length-1)} onChange={e=>setPointIndex(Number(e.target.value))}>{s.vector.points.map((_,i)=><option key={i} value={i}>Point {i+1}</option>)}</select></label>
+    <div className="field-row">{['X','Y'].map((axis,j)=><label key={axis}>{axis}<ValueInput value={String(s.vector!.points[Math.min(pointIndex,s.vector!.points.length-1)][j])} onCommit={value=>{const p=s.vector!.points[Math.min(pointIndex,s.vector!.points.length-1)];send({type:'vector-update',field:'point',index:pointIndex,x:j===0?Number(value):p[0],y:j===1?Number(value):p[1]});}}/></label>)}</div>
+   </>:<>
+    {colour('Fill colour','backgroundColor')}
+    <label>Round corners<input type="range" min="0" max="100" value={parseFloat(st.borderRadius)||0} onChange={e=>field('borderRadius',e.target.value+'px')}/><span>{Math.round(parseFloat(st.borderRadius)||0)} px</span></label>
+    {colour('Outline colour','borderColor')}
+    <div className="field-row">{styleInput('Outline width','borderWidth','2px')}{choice('Outline style','borderStyle',[['none','None'],['solid','Solid'],['dashed','Dashed']])}</div>
+   </>}
+   <div className="field-row">{styleInput('Width','width','160px')}{styleInput('Height','height','100px')}</div>
+   <label>Rotation (degrees)<input type="number" min="-360" max="360" value={parseFloat(st.rotate)||0} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=360)field('rotate',n+'deg');}}/></label>
+  </>)}
   {s.canText&&group('typography','Typography',<>   {choice('Font family','fontFamily',[['Arial, sans-serif','Arial'],['Georgia, serif','Georgia'],['Verdana, sans-serif','Verdana'],['Tahoma, sans-serif','Tahoma'],['"Trebuchet MS", sans-serif','Trebuchet'],['"Courier New", monospace','Courier']])}
    <div className="field-row">{colour('Text colour','color')}<label>Size (px)<input type="number" min="8" max="300" value={s.fontSize} onChange={e=>{const n=+e.target.value;if(n>=8&&n<=300)field('fontSize',n);}}/></label></div>
    <div className="field-row">{choice('Weight','fontWeight',[['400','Regular'],['500','Medium'],['600','Semibold'],['700','Bold'],['900','Heavy']])}{choice('Style','fontStyle',[['normal','Normal'],['italic','Italic']])}</div>
