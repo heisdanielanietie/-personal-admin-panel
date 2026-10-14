@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   title: "DauVinci Studio — Your website workspace",
   description: "DauVinci Studio — a creative workspace for visually editing websites, shaping ideas and saving your work.",
   icons: {
-    icon: "/favicon.svg?v=dauvinci",
-    shortcut: "/favicon.svg?v=dauvinci",
+    icon: "/favicon.svg?v=dvs-2",
+    shortcut: "/favicon.svg?v=dvs-2",
   },
 };
 

@@ -32,3 +32,9 @@ html[data-studio-theme] .published-bar{background:var(--studio-surface);border-c
 html[data-studio-theme=dark] :is(.add-card strong,.project-card h3,.section-heading h2,.page-heading h1,.no-selection h3){color:#faf8ff}
 @media(max-width:900px){html[data-studio-theme] .login-page{grid-template-columns:1fr}.login-art{display:none}.topbar{padding:12px 18px}.topnav{gap:12px}.private-label{display:none}.dauvinci-wordmark{width:202px;height:54px}.dauvinci-wordmark img{width:238px;left:-23px;top:-33px}.login-card .dauvinci-wordmark img{width:274px;left:-25px;top:-38px}html[data-studio-theme] .login-card{width:min(460px,calc(100% - 32px));padding:26px;margin:24px 0}html[data-studio-theme] .start-copy h2{font-size:32px}}
 @media(max-width:540px){.topbar{align-items:flex-start;gap:10px}.topnav{width:100%;justify-content:space-between}.topnav .avatar{display:none}.topnav .help-btn{font-size:12px}.topnav .studio-theme-button{font-size:12px;padding:6px 8px}}
+
+/* Theme-aware original DVS artwork, without the rectangular background. */
+.dauvinci-wordmark,.login-card .dauvinci-wordmark{width:232px;height:auto;aspect-ratio:1720/490;background:transparent;border-radius:0;overflow:visible;color:#a000c8}
+.dauvinci-wordmark svg{display:block;width:100%;height:auto;overflow:hidden}
+html[data-studio-theme=dark] .dauvinci-wordmark{color:#fff}
+@media(max-width:900px){.dauvinci-wordmark{width:202px}.login-card .dauvinci-wordmark{width:min(232px,100%)}}
