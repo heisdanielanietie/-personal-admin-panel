@@ -1,6 +1,6 @@
 /* The theme belongs to the document so portalled dialogs share it. Iframes are separate documents. */
-html[data-studio-theme=light]{--studio-surface:#fff;--studio-bg:#f5f7fb;--studio-text:#172039;--studio-muted:#718096;--studio-border:#dce3ef;--studio-input:#fff;--studio-active:#eaf0ff;--studio-accent:#275cf4}
-html[data-studio-theme=dark]{--studio-surface:#182235;--studio-bg:#0e1625;--studio-text:#e6edf8;--studio-muted:#b0bed2;--studio-border:#3d4e67;--studio-input:#233249;--studio-active:#314a75;--studio-accent:#9fbaff}
+html[data-studio-theme=light]{--studio-surface:#fff;--studio-bg:#f6f5f8;--studio-text:#211b29;--studio-muted:#718096;--studio-border:#dce3ef;--studio-input:#fff;--studio-active:#f1eaff;--studio-accent:#7c3aed}
+html[data-studio-theme=dark]{--studio-surface:#1b1720;--studio-bg:#0c0a0f;--studio-text:#faf8ff;--studio-muted:#bcb3c9;--studio-border:#403649;--studio-input:#25202d;--studio-active:#3c225a;--studio-accent:#c4a1ff}
 html[data-studio-theme] body,html[data-studio-theme] .studio,html[data-studio-theme] .login-page{background:var(--studio-bg)!important;color:var(--studio-text)!important}
 html[data-studio-theme] :is(.topbar,.editor-bar,.editor-toolbar,.inspector,.inspector-heading,.studio-copyright,.canvas-browser,.project-card,.login-card,.tool-rail,[data-slot=dialog-content],[data-slot=alert-dialog-content]){background:var(--studio-surface)!important;color:var(--studio-text)!important;border-color:var(--studio-border)!important}
 html[data-studio-theme] .studio aside,html[data-studio-theme] .studio aside :is(fieldset,section,nav,h3,button,label,strong){background-color:var(--studio-surface)!important;color:var(--studio-text)!important;border-color:var(--studio-border)!important}
@@ -9,6 +9,26 @@ html[data-studio-theme] :is(.studio,.login-page,[data-slot=dialog-content],[data
 html[data-studio-theme] .studio aside p{color:var(--studio-muted)!important}
 html[data-studio-theme] .studio :is(aside,.tool-rail) button[aria-pressed=true]{background:var(--studio-active)!important;color:var(--studio-accent)!important}
 html[data-studio-theme] :is(.canvas-viewport,.page-tabs){background:var(--studio-bg)!important;border-color:var(--studio-border)!important}
-html[data-studio-theme=dark] :is(.dialog-note,.file-drop,.login-message,.add-card,.error-box,.loading){background:#233249!important;color:#dce5f4!important;border-color:#3d4e67!important}
-html[data-studio-theme=dark] [data-slot$=description]{color:#b0bed2!important}
-.studio-theme-button{border:1px solid var(--studio-border,#dce3ef);border-radius:8px;background:var(--studio-input,#fff);color:var(--studio-text,#172039);font-size:13px;min-height:38px;padding:8px 12px;white-space:nowrap}.studio-theme-button:focus-visible{outline:3px solid #7095ff;outline-offset:3px}.login-card>.studio-theme-button{display:block;margin:0 0 24px auto}
+html[data-studio-theme=dark] :is(.dialog-note,.file-drop,.login-message,.add-card,.error-box,.loading){background:#25202d!important;color:#eee7f7!important;border-color:#403649!important}
+html[data-studio-theme=dark] [data-slot$=description]{color:#bcb3c9!important}
+.studio-theme-button{border:1px solid var(--studio-border,#dce3ef);border-radius:8px;background:var(--studio-input,#fff);color:var(--studio-text,#211b29);font-size:13px;min-height:38px;padding:8px 12px;white-space:nowrap}.studio-theme-button:focus-visible{outline:3px solid #a78bfa;outline-offset:3px}.login-card>.studio-theme-button{display:block;margin:0 0 24px auto}
+/* DauVinci visual identity: original supplied artwork, purple accents, neutral work surfaces. */
+.dauvinci-wordmark{display:block;position:relative;overflow:hidden;width:232px;height:62px;border-radius:10px;background:#0e0316;flex-shrink:0}
+.dauvinci-wordmark img{position:absolute;width:274px;height:auto;max-width:none;left:-25px;top:-38px}
+.topbar{height:auto;min-height:88px;padding:12px 3%;gap:18px;flex-wrap:wrap}.topnav{gap:18px;flex-wrap:wrap}.brand{letter-spacing:0}
+html[data-studio-theme] .primary{background:#7c3aed;color:#fff;border-color:#7c3aed;box-shadow:0 4px 14px #7c3aed24}.primary:hover{background:#6d28d9!important}
+html[data-studio-theme] .primary.white{background:white;color:#32134f;border-color:white}
+html[data-studio-theme] .start-panel{background:radial-gradient(ellipse at 85% 0%,#71209a66,transparent 65%),linear-gradient(120deg,#0c0910,#240a36 70%,#45075a);border:1px solid #553067;border-radius:22px;min-height:350px}
+html[data-studio-theme] .start-copy h2{font-size:40px;letter-spacing:-1.3px}.start-copy .eyebrow{color:#dcc2ff}.mini-window{border-color:#62417a}
+html[data-studio-theme] :is(.art-0,.art-1,.art-2){background:linear-gradient(135deg,#21102e,#5d1b7d);color:#f4eaff}
+html[data-studio-theme] :is(.page-heading p,.muted,.editor-hint,.tool-instructions,.login-card>p,.login-copyright,.bottom-note){color:var(--studio-muted)}
+html[data-studio-theme] .login-page{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);padding:0;gap:0;align-items:stretch;min-height:100dvh}
+.login-art{background:linear-gradient(170deg,#000 25%,#250035 70%,#590075);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;min-width:0;overflow:hidden}
+.login-art>img{width:min(500px,100%);height:auto;display:block;border-radius:16px}.login-art>div{max-width:440px;margin-top:26px}.login-art h2{font-size:clamp(30px,3vw,48px);font-weight:650;line-height:1.12;letter-spacing:-1.5px;margin:18px 0}.login-art p{color:#d6c3e5;font-size:15px;line-height:1.8;max-width:350px}
+html[data-studio-theme] .login-card{align-self:center;justify-self:center;width:min(460px,calc(100% - 64px));margin:40px 0;border-radius:22px;padding:34px;box-shadow:0 20px 70px #240b3710}.login-card h1{font-size:29px;line-height:1.2}.login-card .brand{justify-content:flex-start}.login-card .dauvinci-wordmark{width:232px;height:62px}
+html[data-studio-theme] .login-links button{color:var(--studio-accent)}
+html[data-studio-theme] .studio aside input:focus,html[data-studio-theme] input:focus{border-color:#a78bfa!important;outline:2px solid #a78bfa44}
+html[data-studio-theme] .published-bar{background:var(--studio-surface);border-color:var(--studio-border)}
+html[data-studio-theme=dark] :is(.add-card strong,.project-card h3,.section-heading h2,.page-heading h1,.no-selection h3){color:#faf8ff}
+@media(max-width:900px){html[data-studio-theme] .login-page{grid-template-columns:1fr}.login-art{display:none}.topbar{padding:12px 18px}.topnav{gap:12px}.private-label{display:none}.dauvinci-wordmark{width:202px;height:54px}.dauvinci-wordmark img{width:238px;left:-23px;top:-33px}.login-card .dauvinci-wordmark img{width:274px;left:-25px;top:-38px}html[data-studio-theme] .login-card{width:min(460px,calc(100% - 32px));padding:26px;margin:24px 0}html[data-studio-theme] .start-copy h2{font-size:32px}}
+@media(max-width:540px){.topbar{align-items:flex-start;gap:10px}.topnav{width:100%;justify-content:space-between}.topnav .avatar{display:none}.topnav .help-btn{font-size:12px}.topnav .studio-theme-button{font-size:12px;padding:6px 8px}}

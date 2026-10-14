@@ -4,11 +4,11 @@ import "./studio-theme.css";
 import {StudioTheme} from "./studio-theme";
 
 export const metadata: Metadata = {
-  title: "Daniel Studio — Your website workspace",
-  description: "Edit your websites visually, save drafts, and publish a private copy.",
+  title: "DauVinci Studio — Your website workspace",
+  description: "DauVinci Studio — a creative workspace for visually editing websites, shaping ideas and saving your work.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/favicon.svg?v=dauvinci",
+    shortcut: "/favicon.svg?v=dauvinci",
   },
 };
 

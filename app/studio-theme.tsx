@@ -10,4 +10,4 @@ export function StudioTheme({children}:{children:ReactNode}){
  return <Context.Provider value={{theme,toggle}}>{children}</Context.Provider>;
 }
 export const useStudioTheme=()=>useContext(Context);
-export function ThemeButton(){const {theme,toggle}=useStudioTheme();return <button type="button" className="studio-theme-button" aria-label="Dark mode for Daniel Studio" aria-pressed={theme==='dark'} onClick={toggle}>{theme==='dark'?'☀ Light mode':'☾ Dark mode'}</button>;}
+export function ThemeButton(){const {theme,toggle}=useStudioTheme();return <button type="button" className="studio-theme-button" aria-label="Dark mode for DauVinci Studio" aria-pressed={theme==='dark'} onClick={toggle}>{theme==='dark'?'☀ Light mode':'☾ Dark mode'}</button>;}

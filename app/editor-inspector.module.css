@@ -4,11 +4,11 @@
 .panel [hidden] {display:none !important;}
 .selection {display:grid; grid-template-columns:minmax(0,1fr); gap:10px; padding:20px 0;}
 .element {display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#69768c;}
-.element strong {font-size:12px; color:#275cf4; background:#edf3ff; padding:4px 10px; border-radius:6px;}
+.element strong {font-size:12px; color:#7c3aed; background:#f1eaff; padding:4px 10px; border-radius:6px;}
 .panel .selection button {width:100%; justify-content:flex-start; min-height:40px; font-size:13px; padding:10px 12px; white-space:normal;}
 .tabs {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; background:#edf1f7; padding:4px; border-radius:10px; margin:0 0 20px;}
 .tabs button {border:0; border-radius:7px; background:transparent; color:#637189; padding:11px 4px; font-size:13px; font-weight:600; min-width:0;}
-.tabs button[aria-pressed=true] {background:white; color:#275cf4; box-shadow:0 1px 4px #162b4f16;}
+.tabs button[aria-pressed=true] {background:white; color:#7c3aed; box-shadow:0 1px 4px #162b4f16;}
 .category {display:grid; gap:12px;}
 .group {border:1px solid #e0e6ef; border-radius:10px; overflow:hidden; background:white;}
 .group h3 {margin:0; font-size:13px; font-weight:650;}
@@ -30,5 +30,5 @@
 .panel :global(.control-buttons) button {width:100%; padding:10px 6px; min-height:40px; font-size:12px; white-space:normal; text-transform:capitalize;}
 .deleteArea {padding-top:16px; border-top:1px solid #e7ebf2;}
 .panel .deleteArea button {width:100%; color:#b42318; border-color:#f0c7c3; background:#fff8f7; white-space:normal; font-size:12px; padding:11px;}
-.panel button:focus-visible, .panel select:focus-visible {outline:3px solid #7095ff; outline-offset:2px;}
+.panel button:focus-visible, .panel select:focus-visible {outline:3px solid #a78bfa; outline-offset:2px;}
 @media(max-width:700px) {.panel {padding-inline:18px;}.selection {grid-template-columns:1fr 1fr;}.element {grid-column:1/-1;}.panel .selection button {justify-content:center;} }

@@ -1,4 +1,4 @@
-# Daniel Studio
+# DauVinci Studio
 
 A public visual website editor with private workspaces for each registered user. Production runs on **Netlify**, with source code on **GitHub**. It does not require ChatGPT Sites.
 
@@ -61,7 +61,7 @@ Canvas controls provide zoom, fit, hand panning and desktop/tablet/phone viewpor
 
 Insert adds text, headings, containers, dividers, rectangles, circles, buttons, sections and images. Design includes borders, shadow presets, opacity and two-colour gradients. Auto Layout applies wrapping flex rows or columns with alignment, distribution and gap controls. Page styles store up to 30 named colour or typography presets in page metadata, so saving/exporting preserves them. They apply by value, not as live-linked global styles. Scripts remain disabled and resize handles/selection labels are excluded from exports.
 
-The Daniel Studio login and workspace display a copyright footer. User-uploaded pages are not branded. No new data recipients, billing or marketing features are introduced by these controls.
+The DauVinci Studio login and workspace display a copyright footer. User-uploaded pages are not branded. No new data recipients, billing or marketing features are introduced by these controls.
 
 ## Dragging, ZIPs, themes and shapes
 Dragging defaults to **Free move**: a visual offset preserves the original layout slot, dimensions and sibling order. Existing transforms are retained. Inline text uses relative offsets; other objects use CSS translate. Undo/redo, saving and HTML export preserve the result. **Layout move** explicitly reorders siblings. Offsets remain pixel-based across viewport sizes: check Phone view for overlap. Moving a container moves its contents, identified by the canvas selection badge. Previously saved absolute positioning is preserved; this does not reconstruct layout slots removed by older edits. Use Hand for canvas panning; switch it off to drag elements. Locked layers remain protected.
@@ -89,3 +89,7 @@ Ctrl+R repeats the latest supported movement, alignment, duplication or property
 Convert to Curves supports Studio basic shapes, not text. Existing freehand paths are already vectors. Combine creates an SVG compound containing separate subpaths, not a boolean union. It requires untransformed, absolutely positioned SVG siblings in the same container. Break Apart supports these Studio compounds, including resized compounds; reset movement/rotation before breaking apart. Freehand point editing remains available before combining. These limits are shown in the command panel and in notices.
 
 Shortcut regression checks: `STUDIO_TEST_JSDOM=/path/to/node_modules/jsdom node tests/editor-shortcuts.cjs`. These checks exercise DOM/state behaviour; browser-reserved keys, print dialogs and signed-in fullscreen are not covered by DOM tests.
+
+
+## DauVinci Studio branding
+The interface uses the supplied DauVinci logos with black, white and purple themes. The existing Netlify site, account system, theme preference key and `daniel-studio` storage name stay unchanged to preserve accounts and projects. The rebrand adds no external font, analytics, billing or marketing services. Uploaded pages retain their own branding.

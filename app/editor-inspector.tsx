@@ -15,7 +15,7 @@ export function EditorInspector({selection:s,field,send,imageFile,busy,shapeEdit
  const [pointIndex,setPointIndex]=useState(0);
  useEffect(()=>{if(shapeEdit){setTab('design');setOpenGroup('shape');}},[shapeEdit]);
  useEffect(()=>setPointIndex(0),[s.layerId]);
- const [gradientFrom,setGradientFrom]=useState('#275cf4'),[gradientTo,setGradientTo]=useState('#9b5cf6');
+ const [gradientFrom,setGradientFrom]=useState('#7c3aed'),[gradientTo,setGradientTo]=useState('#9b5cf6');
  const [tab,setTab]=useState<'content'|'design'|'layout'>(s.canText||s.tag==='IMG'?'content':'design');
  const [openGroup,setOpenGroup]=useState(s.canText?'text':s.tag==='IMG'?'image':'background');
  const changeTab=(next:'content'|'design'|'layout')=>{setTab(next);setOpenGroup(next==='content'?(s.canText?'text':s.tag==='IMG'?'image':'link'):next==='design'?'background':'size');};
