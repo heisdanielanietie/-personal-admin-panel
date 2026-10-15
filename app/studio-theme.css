@@ -40,3 +40,13 @@ html[data-studio-theme=dark] .dauvinci-wordmark{color:#fff}
 @media(max-width:900px){.dauvinci-wordmark{width:202px}.login-card .dauvinci-wordmark{width:min(232px,100%)}}
 
 .login-art>.dauvinci-stacked{width:min(500px,100%);aspect-ratio:600/540;color:#fff}.dauvinci-wordmark svg svg{width:revert;height:revert}
+
+/* Password visibility is local to the current form and never submits it. */
+.login-card .password-field{margin:22px 0}
+.login-card form .password-field label{margin:0}
+.password-input-wrap{position:relative}
+.login-card .password-input-wrap input{padding-right:50px;width:100%}
+.password-visibility{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:44px;height:40px;display:grid;place-items:center;border:0;border-radius:7px;background:transparent;color:var(--studio-muted,#718096);cursor:pointer}
+.password-visibility:hover{color:var(--studio-accent,#7c3aed);background:var(--studio-active,#f1eaff)}
+.password-visibility:focus-visible{outline:2px solid #a78bfa;outline-offset:1px}
+.password-input-wrap input::-ms-reveal{display:none}
