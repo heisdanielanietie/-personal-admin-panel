@@ -38,3 +38,5 @@ html[data-studio-theme=dark] :is(.add-card strong,.project-card h3,.section-head
 .dauvinci-wordmark svg{display:block;width:100%;height:auto;overflow:hidden}
 html[data-studio-theme=dark] .dauvinci-wordmark{color:#fff}
 @media(max-width:900px){.dauvinci-wordmark{width:202px}.login-card .dauvinci-wordmark{width:min(232px,100%)}}
+
+.login-art>.dauvinci-stacked{width:min(500px,100%);aspect-ratio:600/540;color:#fff}.dauvinci-wordmark svg svg{width:revert;height:revert}
