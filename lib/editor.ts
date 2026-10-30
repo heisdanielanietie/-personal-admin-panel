@@ -1,5 +1,34 @@
 export const sampleHtml=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My creative portfolio</title><style>*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#172039;background:#fff}nav{display:flex;justify-content:space-between;align-items:center;padding:28px 7%;border-bottom:1px solid #e8ebf2}nav strong{font-size:21px}a{color:inherit;text-decoration:none}nav a{font-size:14px}header{padding:80px 7%;background:#edf2ff}header small{font-size:13px;letter-spacing:2px;color:#7c3aed}h1{font-size:clamp(36px,6vw,74px);line-height:1.05;letter-spacing:-3px;max-width:800px;margin:24px 0}header p{font-size:19px;line-height:1.6;max-width:530px;color:#536078}.button{display:inline-block;background:#7c3aed;color:white;padding:16px 24px;border-radius:8px;margin-top:18px;font-weight:bold}section{padding:52px 7%}h2{font-size:32px;letter-spacing:-1px;margin-top:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.card{background:#f5f7fb;padding:26px;border-radius:12px}.card b{font-size:20px}.card p{line-height:1.6;color:#536078}footer{padding:30px 7%;border-top:1px solid #e8ebf2;color:#536078}@media(max-width:580px){.grid{grid-template-columns:1fr}header{padding-top:50px}h1{letter-spacing:-1px}}</style></head><body><nav><strong>DauVinci.</strong><a href="#contact">Let's work together ↗</a></nav><header><small>DESIGN · WEB · IDEAS</small><h1>Good ideas deserve<br>a great presence.</h1><p>I create thoughtful designs and websites that help brands stand out and connect with people.</p><a class="button" href="#contact">Let's create something</a></header><section><h2>What I can help you with</h2><div class="grid"><div class="card"><b>Brand identity</b><p>Visual identities that make a memorable first impression.</p></div><div class="card"><b>Graphic design</b><p>Clear, engaging designs for your next big idea.</p></div><div class="card"><b>Web design</b><p>Responsive websites that put your business first.</p></div></div></section><section id="contact"><h2>Have a project in mind?</h2><p>Tell me what you are working on. Let's bring it to life.</p><a class="button" href="mailto:hello@example.com">Get in touch</a></section><footer><p>Your name · Creative portfolio</p></footer></body></html>`;
-export function safeUrl(s:string,image=false){if(image&&/^data:image\/(png|jpeg|webp|gif);base64,/i.test(s))return true;if(!image&&/^(?:\.\/)?[a-zA-Z0-9][a-zA-Z0-9_.() -]*\.html?(?:[?#].*)?$/i.test(s))return true;return /^(https?:\/\/|mailto:|tel:|#|\/(?!\/))/i.test(s);}
+export function safeUrl(s:string,image=false){if(image&&/^data:image\/(png|jpeg|webp|gif|svg\+xml);base64,/i.test(s))return true;if(!image&&/^(?:\.\/)?[a-zA-Z0-9][a-zA-Z0-9_.() -]*\.html?(?:[?#].*)?$/i.test(s))return true;return /^(https?:\/\/|mailto:|tel:|#|\/(?!\/))/i.test(s);}
+export function sanitizeSvgImage(raw:string){
+ if(raw.length>750_000)throw new Error('Choose an SVG smaller than 750 KB.');
+ if(/<!DOCTYPE|<!ENTITY/i.test(raw))throw new Error('This SVG contains unsupported XML declarations.');
+ const doc=new DOMParser().parseFromString(raw,'image/svg+xml'),root=doc.documentElement;
+ if(doc.querySelector('parsererror')||root.localName!=='svg'||root.namespaceURI!=='http://www.w3.org/2000/svg')throw new Error('This file is not a valid SVG image.');
+ const tags=new Set(['svg','g','path','rect','circle','ellipse','line','polyline','polygon','defs','linearGradient','radialGradient','stop','clipPath','mask','title','desc','text','tspan']);
+ const attributes=new Set(['xmlns','id','viewBox','width','height','x','y','x1','y1','x2','y2','cx','cy','r','rx','ry','d','points','transform','preserveAspectRatio','fill','stroke','opacity','fill-opacity','stroke-opacity','stroke-width','stroke-linecap','stroke-linejoin','stroke-dasharray','stroke-dashoffset','fill-rule','clip-rule','stop-color','stop-opacity','offset','gradientUnits','gradientTransform','spreadMethod','clip-path','mask','href','xlink:href','font-family','font-size','font-weight','text-anchor','dominant-baseline','letter-spacing','dx','dy']);
+ const localRef=/^url\(\s*#[\w:.-]+\s*\)$/i,color=/^(?:none|transparent|currentColor|#[\da-f]{3,8}|[a-z]{1,24}|(?:rgb|rgba|hsl|hsla)\([\d.%\s,\/+-]+\)|url\(\s*#[\w:.-]+\s*\))$/i;
+ for(const el of [root,...Array.from(root.querySelectorAll('*'))]){
+  if(el.namespaceURI!=='http://www.w3.org/2000/svg'||!tags.has(el.localName)){el.remove();continue;}
+  for(const attr of Array.from(el.attributes)){
+   const name=attr.name,value=attr.value.trim();
+   if(!attributes.has(name)||/^on/i.test(name)){el.removeAttributeNode(attr);continue;}
+   if(['href','xlink:href'].includes(name)&&!/^#[\w:.-]+$/.test(value)){el.removeAttributeNode(attr);continue;}
+   if(['fill','stroke','stop-color'].includes(name)&&!color.test(value)){el.removeAttributeNode(attr);continue;}
+   if(['clip-path','mask'].includes(name)&&!localRef.test(value)){el.removeAttributeNode(attr);continue;}
+   if(['d','points','transform'].includes(name)&&value.length>200_000){el.removeAttributeNode(attr);continue;}
+   if(['width','height','x','y','x1','y1','x2','y2','cx','cy','r','rx','ry','stroke-width','stroke-dasharray','stroke-dashoffset','font-size','letter-spacing','dx','dy','offset','opacity','fill-opacity','stroke-opacity','stop-opacity'].includes(name)&&!/^[\d.eE%+\-\s,]+$/.test(value)){el.removeAttributeNode(attr);continue;}
+  }
+ }
+ for(const attr of Array.from(root.attributes)){
+  if(!attributes.has(attr.name)||/^on/i.test(attr.name)||(['width','height'].includes(attr.name)&&!/^[\d.eE%+\-\s,]+$/.test(attr.value.trim()))){root.removeAttributeNode(attr);continue;}
+  if(['href','xlink:href'].includes(attr.name)&&!/^#[\w:.-]+$/.test(attr.value.trim()))root.removeAttributeNode(attr);
+ }
+ root.setAttribute('xmlns','http://www.w3.org/2000/svg');
+ const bytes=new TextEncoder().encode(new XMLSerializer().serializeToString(root));let binary='';
+ for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));
+ return 'data:image/svg+xml;base64,'+btoa(binary);
+}
 export function cleanHtml(raw:string){const doc=new DOMParser().parseFromString(raw,'text/html');doc.querySelectorAll('script,iframe,object,embed,base,meta[http-equiv],link[rel="import"]').forEach(e=>e.remove());doc.querySelectorAll('*').forEach(el=>{for(const a of Array.from(el.attributes)){if(/^on/i.test(a.name)||a.name==='srcdoc'||a.name.startsWith('data-ds')||a.name==='nonce')el.removeAttribute(a.name);if(['href','src','action','formaction','xlink:href'].includes(a.name)&&/^\s*(javascript|vbscript|data:text\/html):/i.test(a.value))el.removeAttribute(a.name);}});return '<!DOCTYPE html>\n'+doc.documentElement.outerHTML;}
 export function editorDocument(html:string,token:string){
  const doc=new DOMParser().parseFromString(cleanHtml(html),'text/html');
