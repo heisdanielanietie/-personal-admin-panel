@@ -7,6 +7,8 @@ A public visual website editor with private workspaces for each registered user.
 - Click text, buttons and images to edit; add text sections and images.
 - Desktop and mobile previews.
 - Durable drafts, private published copies and previous-publication restore.
+- Automatic draft saving after edits, using the existing authenticated project storage.
+- Sanitized SVG image import alongside raster images.
 - Download the edited HTML for an external host.
 - Public registration with Netlify Identity login, email confirmation, recovery and sign-out.
 
@@ -61,6 +63,8 @@ Canvas controls provide zoom, fit, hand panning and desktop/tablet/phone viewpor
 
 Insert adds text, headings, containers, dividers, rectangles, circles, buttons, sections and images. Design includes borders, shadow presets, opacity and two-colour gradients. Auto Layout applies wrapping flex rows or columns with alignment, distribution and gap controls. Page styles store up to 30 named colour or typography presets in page metadata, so saving/exporting preserves them. They apply by value, not as live-linked global styles. Scripts remain disabled and resize handles/selection labels are excluded from exports.
 
+Draft changes automatically save after 1.2 seconds without further edits through the authenticated, revision-checked project API. Save errors are reported in the editor. SVG image uploads are limited to 750 KB and sanitized before insertion; scripts, event handlers, external links and unsupported SVG elements are removed.
+
 The DauVinci Studio login and workspace display a copyright footer. User-uploaded pages are not branded. No new data recipients, billing or marketing features are introduced by these controls.
 
 ## Dragging, ZIPs, themes and shapes
@@ -86,7 +90,7 @@ Shift-click on the canvas or in Layers adds/removes objects. Ctrl+A selects unlo
 
 Ctrl+R repeats the latest supported movement, alignment, duplication or property/insert command. Undo history remains limited to the current page/session. Text fields keep native editing shortcuts. Shortcuts are paused while a dialog is open or a transfer is busy. Browser/OS shortcuts may intercept events before the page receives them; use the command buttons or Ctrl+Alt+N/O/I/E/R/L/Q alternatives for the corresponding commands. Alt+F4 stays with Windows. F9 opens preview in browser fullscreen when supported, with a full-window fallback; Escape returns to editing. Z selects click-to-zoom; F2 zooms once. F3/F4/Shift+F4/Shift+F2 provide zoom-out, fit objects, fit page and fit selection.
 
-Convert to Curves supports Studio basic shapes, not text. Existing freehand paths are already vectors. Combine creates an SVG compound containing separate subpaths, not a boolean union. It requires untransformed, absolutely positioned SVG siblings in the same container. Break Apart supports these Studio compounds, including resized compounds; reset movement/rotation before breaking apart. Freehand point editing remains available before combining. These limits are shown in the command panel and in notices.
+Convert to Curves supports Studio basic shapes, not text. Existing freehand paths are already vectors. Combine creates an SVG compound containing separate subpaths, not a boolean union. It requires untransformed, absolutely positioned SVG siblings in the same container. Break Apart supports these Studio compounds, including resized compounds; reset movement/rotation before breaking them apart. Freehand point editing remains available before combining. These limits are shown in the command panel and in notices.
 
 Shortcut regression checks: `STUDIO_TEST_JSDOM=/path/to/node_modules/jsdom node tests/editor-shortcuts.cjs`. These checks exercise DOM/state behaviour; browser-reserved keys, print dialogs and signed-in fullscreen are not covered by DOM tests.
 
