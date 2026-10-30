@@ -33,13 +33,13 @@ export function EditorInspector({selection:s,field,send,imageFile,busy,shapeEdit
 
   {s.tag==='A'&&group('link','Link destination',<><label>Link<ValueInput value={s.href} onCommit={v=>{if(!v||safeUrl(v))field('href',v);else toast.error('Use https://, #section, mailto:, tel: or a page.html filename.');}}/></label><p className="field-note">Use the Design tab to style this link as a button.</p></>)}
   {s.tag==='BUTTON'&&<p className="field-note">This is a form/action button. Add a link button for navigation; changing its label does not connect a form service.</p>}
-  {s.tag==='IMG'&&group('image','Image',<><label>Description<ValueInput value={s.alt} onCommit={v=>field('alt',v)}/></label><label className="upload-label">Replace image<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>{imageFile(e.target.files?.[0],true);e.target.value='';}}/></label><p className="field-note">JPG, PNG, WebP or GIF · up to 750 KB</p>
+  {s.tag==='IMG'&&group('image','Image',<><label>Description<ValueInput value={s.alt} onCommit={v=>field('alt',v)}/></label><label className="upload-label">Replace image<input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg" onChange={e=>{imageFile(e.target.files?.[0],true);e.target.value='';}}/></label><p className="field-note">JPG, PNG, WebP, GIF or SVG · up to 750 KB</p>
   </>)}
   {!s.canText&&s.tag!=='IMG'&&s.tag!=='A'&&<p className={ui.empty}>This is a container. Select text or an image inside it to change its content, or use Design and Layout to style the container.</p>}
   </div>
   <div className={ui.category} hidden={tab!=='design'}>
   {group('shape','Shape editing',<>
-   {s.vector?<>
+   {s.vector? <>
     <label>Path type<select value={s.vector.closed?'closed':'open'} onChange={e=>send({type:'vector-update',field:'closed',value:e.target.value==='closed'})}><option value="open">Open line</option><option value="closed">Closed shape</option></select></label>
     <div className="field-row"><label>Fill<input type="color" value={hex(s.vector.fill)} onChange={e=>send({type:'vector-update',field:'fill',value:e.target.value})}/></label><label>Outline<input type="color" value={hex(s.vector.stroke)} onChange={e=>send({type:'vector-update',field:'stroke',value:e.target.value})}/></label></div>
     <label>Outline width<input type="number" min="0" max="100" value={s.vector.strokeWidth} onChange={e=>send({type:'vector-update',field:'strokeWidth',value:Number(e.target.value)})}/></label>
@@ -69,7 +69,7 @@ export function EditorInspector({selection:s,field,send,imageFile,busy,shapeEdit
    {colour('Border colour','borderColor')}
    {choice('Shadow','boxShadow',[['none','None'],['0 4px 16px rgba(15,23,42,.12)','Soft'],['0 12px 32px rgba(15,23,42,.22)','Elevated'],['0 2px 4px rgba(15,23,42,.18)','Subtle']])}
    <label>Opacity<input type="range" min="0" max="1" step="0.05" value={st.opacity||'1'} onChange={e=>field('opacity',e.target.value)}/><span>{Math.round(Number(st.opacity||1)*100)}%</span></label>
-   <div className="field-row"><label>Gradient start<input type="color" value={gradientFrom} onChange={e=>setGradientFrom(e.target.value)}/></label><label>Gradient end<input type="color" value={gradientTo} onChange={e=>setGradientTo(e.target.value)}/></label></div>
+   <div className="field-row"><label>Gradient start<input type="color" value={gradientFrom} onChange={e=>setGradientFrom(e.target.value)}/></label><label>Gradient end<input type="color" value={gradientTo} onChange={e=>setGradientTo(e.target.value)}/></div>
    <button className="secondary" onClick={()=>send({type:'gradient',from:gradientFrom,to:gradientTo})}>Apply gradient</button>
   </>)}
   {group('corners' ,'Corners',<>{styleInput('Rounded corners','borderRadius','12px')}</>)}
