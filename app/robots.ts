@@ -1,0 +1,2 @@
+import type { MetadataRoute } from "next";
+export default function robots():MetadataRoute.Robots{return {rules:{userAgent:"*",allow:["/","/about","/portfolio","/contact"],disallow:["/workspace","/login","/api/","/p/","/.netlify/"]},sitemap:"https://dauvincistudio.netlify.app/sitemap.xml",host:"https://dauvincistudio.netlify.app"}}

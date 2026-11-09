@@ -1,0 +1,4 @@
+import Link from "next/link";
+import { Brand } from "./brand";
+import styles from "./public-site.module.css";
+export function PublicShell({children}:{children:React.ReactNode}){return <div className={styles.site}><header className={styles.header}><Link href="/" className={styles.logo} aria-label="DauVinci Studio home"><Brand/></Link><nav className={styles.nav} aria-label="Main navigation"><Link href="/about">About</Link><Link href="/portfolio">Portfolio</Link><Link href="/contact">Contact</Link></nav><Link href="/workspace" className={styles.headerCta}>Open workspace ↗</Link></header><main>{children}</main><footer className={styles.footer}><Link href="/" className={styles.footerBrand}><Brand/></Link><span>Thoughtful design. Useful digital experiences.</span><span>© {new Date().getFullYear()} DauVinci Studio</span></footer></div>}
